@@ -98,3 +98,7 @@ def body_as_form_urlencoded(bs: bytes):
 
 def body_as_form_multipart(bs: bytes):
     pass
+
+
+def query_as_form_urlencoded(query: str):
+    pass

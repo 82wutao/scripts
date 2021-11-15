@@ -1,8 +1,22 @@
 
+from abc import ABC, ABCMeta
+from abc import abstractmethod
+
 from . import httpheader
 
 
-class HttpResponse(object):
+# html
+# json
+# xml
+# stream
+# template
+
+# /book/{id:int} get
+# query=>reflact=>paramclass
+# form=>reflact=>paramclass
+# response content-type
+
+class HttpResponse(ABC):
 
     status_code = None
     header_dict = dict()
@@ -34,3 +48,7 @@ class HttpResponse(object):
 
     def addheader(self, header: str, value: str):
         self.header_dict[header] = value
+
+    @abstractmethod
+    def render(self):
+        pass
