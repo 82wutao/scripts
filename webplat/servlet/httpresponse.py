@@ -12,7 +12,7 @@ from . import httpheader
 # response content-type
 
 
-Render: Callable[[Any, Dict, Dict], bytes]
+Render = Callable[[Any, Dict, Dict], bytes]
 
 __RESPONSE_ENCODING_KEY = "ENCODING"
 __RESPONSE_ENCODING_UTF8 = "UTF-8"
@@ -150,6 +150,8 @@ class HttpResponse(object):
 
     def redirect(self, url: str, status_code: int = httpheader.HTTP_STATUSCODE_301):
         # Location: http: // www.example.org/index.asp
+        self.status_code = status_code
+        self.header_dict[httpheader.HTTP_HEADER_LOCATION] = url
         pass
 
     def rewrite(self, path: str):
@@ -181,5 +183,5 @@ class HttpResponse(object):
         if self.renderfunc is None:
             self.renderfunc = htmlrender
 
-        self.contentrendered = self.render(
+        self.contentrendered = self.renderfunc(
             self.content, self.other, self.header_dict)

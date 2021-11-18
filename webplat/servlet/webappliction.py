@@ -5,6 +5,9 @@ import re
 from .httprequest import HttpRequest
 from .httpresponse import HttpResponse
 from .httpheader import *
+from servlet import httpheader
+
+from servlet import httpresponse
 
 
 class WebApplication(object):
@@ -20,6 +23,22 @@ class WebApplication(object):
         url_services.append((method, run))
         self.services[regexp] = url_services
         pass
+
+    def requestmapping(self, url: str, method: str = '*'):
+        def proxy(func):
+            def wrapper(req: HttpRequest, resp: HttpResponse):
+                func(req, resp)
+            self.mapurl(url_pattern=url, run=wrapper, method=method)
+            return wrapper
+        return proxy
+
+    def formatresponse(self, renderfunc: httpresponse. Render):
+        def proxy(func):
+            def wrapper(req: HttpRequest, resp: HttpResponse):
+                resp.setrender(renderfunc)
+                func(req, resp)
+            return wrapper
+        return proxy
 
     def __call__(self, usgi_env: dict,
                  start_response: Callable[[str, List, object], Any]) -> Any:
@@ -68,15 +87,18 @@ class WebApplication(object):
         # try:
         req = HttpRequest(usgi_env)
         resp = HttpResponse()
-        resp_cont = run(req, resp)
-        status_code = resp.statuscode()
-        header_list = resp.headers()
-        resp_cont = resp.content()
+        run(req, resp)
+        status_code = resp.getstatuscode()
+        # TODO is redirect or rewrite
+        resp.render()
+        header_list = resp.getheaders()
+        resp_cont = resp.getcontentrendered()
         # except:
         #    status_code = '500 SErver error'
         #    header_list.append(
         #        (httpheader.HTTP_HEADER_CONTENTTYPE, "text/html;charset=UTF-8"))
         #    resp_cont = 'Server Inner Error'
         #    pass
-        start_response(status_code, header_list)
-        return [resp_cont.encode("utf8")]
+        status = httpheader.statusline(status_code)
+        start_response(status, header_list)
+        return resp_cont

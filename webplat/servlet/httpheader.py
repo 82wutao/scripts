@@ -120,8 +120,14 @@ def getstatusmsg(code: int) -> str:
     return msg
 
 
+def statusline(code: int) -> str:
+    msg = __code_msgs.get(code, '--')
+    return '%d %s' % (code, msg)
+
+
 HTTP_HEADER_CONTENTTYPE = "Content-Type"
 HTTP_HEADER_CONTENTLENGTH = "Content-Length"
+HTTP_HEADER_LOCATION = "Location"
 
 HTTP_MEMITYPE_OCTET_STREAM = 'application/octet-stream'
 HTTP_MEMITYPE_HTML = 'text/html'
