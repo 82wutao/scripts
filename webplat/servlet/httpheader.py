@@ -129,9 +129,87 @@ HTTP_HEADER_CONTENTTYPE = "Content-Type"
 HTTP_HEADER_CONTENTLENGTH = "Content-Length"
 HTTP_HEADER_LOCATION = "Location"
 
-HTTP_MEMITYPE_OCTET_STREAM = 'application/octet-stream'
-HTTP_MEMITYPE_HTML = 'text/html'
-HTTP_MEMITYPE_XML = 'text/xml'
-HTTP_MEMITYPE_FORM_URLENCODED = 'application/x-www-form-urlencoded'
-HTTP_MEMITYPE_FORM_MULTIPART = 'multipart/form-data'
-HTTP_MEMITYPE_JSON = 'application/json'
+
+# https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/MIME_types
+# text 	表明文件是普通文本，理论上是人类可读
+MIMETYPE_TEXT_PLAIN = "text/plain"
+MIMETYPE_TEXT_HTML = "text/html"
+MIMETYPE_TEXT_CSS = "text/css"
+MIMETYPE_TEXT_JAVASCRIPT = "text/javascript"
+# image 	表明是某种图像。不包括视频，但是动态图（比如动态gif）也使用image类型
+MIMETYPE_IMAGE_GIF = "image/gif"
+MIMETYPE_IMAGE_PNG = "image/png"
+MIMETYPE_IMAGE_JPEG = "image/jpeg"
+MIMETYPE_IMAGE_BMP = "image/bmp"
+MIMETYPE_IMAGE_WEBP = "image/webp"
+MIMETYPE_IMAGE_X_ICON = "image/x-icon"
+MIMETYPE_IMAGE_VND_MICROSOFT_ICON = "image/vnd.microsoft.icon"
+# audio 	表明是某种音频文件
+MIMETYPE_AUDIO_MIDI = "audio/midi"
+MIMETYPE_AUDIO_MPEG = "audio/mpeg"
+MIMETYPE_AUDIO_WEBM = "audio/webm"
+MIMETYPE_AUDIO_OGG = "audio/ogg"
+MIMETYPE_AUDIO_WAV = "audio/wav"
+MIMETYPE_AUDIO_WAVE = "audio/wave"
+
+# video 	表明是某种视频文件
+MIMETYPE_VIDEO_WEBM = "video/webm"
+MIMETYPE_VIDEO_AVI = "video/avi"
+MIMETYPE_VIDEO_MP4 = "video/mp4"
+MIMETYPE_VIDEO_OGG = "video/ogg"
+MIMETYPE_VIDEO_M3U8 = "video/m3u8"
+
+# application 	表明是某种二进制数据
+MIMETYPE_APPLICATION_OGG = "application/ogg"
+MIMETYPE_APPLICATION_OCTET_STREAM = "application/octet-stream"
+MIMETYPE_APPLICATION_PKCS12 = "application/pkcs12"
+MIMETYPE_APPLICATION_VND_MSPOWERPOINT = "application/vnd.mspowerpoint"
+MIMETYPE_APPLICATION_XHTML_XML = "application/xhtml+xml"
+MIMETYPE_APPLICATION_XML = "application/xml,"
+MIMETYPE_APPLICATION_PDF = "application/pdf"
+
+MIMETYPE_MULTIPART_FORM_DATA = "multipart/form-data"
+MIMETYPE_MULTIPART_BYTERANGES = "multipart/byteranges"
+# Content-Type: multipart/form-data
+#boundary = aBoundaryString
+# (other headers associated with the multipart document as a whole)
+#
+# --aBoundaryString
+# Content-Disposition: form-data
+#name = "myFile"
+#filename = "img.jpg"
+# Content-Type: image/jpeg
+#
+# (data)
+# --aBoundaryString
+# Content-Disposition: form-data
+#name = "myField"
+#
+# (data)
+# --aBoundaryString
+# (more subparts)
+# --aBoundaryString--
+
+
+# multipart/byteranges用于把部分的响应报文发送回浏览器
+# HTTP/1.1 206 Partial Content
+# Accept-Ranges: bytes
+# Content-Type: multipart/byteranges
+# boundary = 3d6b6a416f9b5
+# Content-Length: 385
+#
+# --3d6b6a416f9b5
+# Content-Type: text/html
+# Content-Range: bytes 100-200/1270
+#
+# eta http-equiv = "Content-type" content = "text/html; charset=utf-8" / >
+# <meta name = "vieport" content
+# --3d6b6a416f9b5
+# Content-Type: text/html
+# Content-Range: bytes 300-400/1270
+#
+# -color:  # f0f0f2;
+#    margin: 0
+#    padding: 0
+#    font-family: "Open Sans", "Helvetica
+# --3d6b6a416f9b5--
