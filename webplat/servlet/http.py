@@ -167,6 +167,7 @@ MIMETYPE_APPLICATION_VND_MSPOWERPOINT = "application/vnd.mspowerpoint"
 MIMETYPE_APPLICATION_XHTML_XML = "application/xhtml+xml"
 MIMETYPE_APPLICATION_XML = "application/xml,"
 MIMETYPE_APPLICATION_PDF = "application/pdf"
+MIMETYPE_APPLICATION_JSON = "application/json"
 
 MIMETYPE_MULTIPART_FORM_DATA = "multipart/form-data"
 MIMETYPE_MULTIPART_BYTERANGES = "multipart/byteranges"

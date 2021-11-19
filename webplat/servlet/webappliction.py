@@ -33,7 +33,7 @@ class WebApplication(object):
             resourcedir = webcontext.WEBCTX_RESOURCE_DIR_DEFAULT
 
         def _realhandle_type(req: httprequest.HttpRequest, resp: httpresponse.HttpResponse,
-                             contenttype: str) -> str:
+                             contenttype: str, charset: str) -> str:
             resp.setrender(renders.filerender)
 
             request_path = req.getpath()
@@ -45,12 +45,15 @@ class WebApplication(object):
             if not path.exists(file_path):
                 return None
 
+            if charset:
+                contenttype = contenttype+"; charset="+charset
             resp.setcontenttype(contenttype)
             resp.responsex(http.HTTP_STATUSCODE_200, file_path)
             return file_path
 
         def _cssload(req: httprequest.HttpRequest, resp: httpresponse.HttpResponse) -> None:
-            file_path = _realhandle_type(req, resp, http.MIMETYPE_TEXT_CSS)
+            file_path = _realhandle_type(req, resp,
+                                         http.MIMETYPE_TEXT_CSS, webcontext.WEBCTX_RESPONSE_ENCODING_UTF8)
             if file_path:
                 return
 
@@ -58,8 +61,8 @@ class WebApplication(object):
             pass
 
         def _octetstreamload(req: httprequest.HttpRequest, resp: httpresponse.HttpResponse) -> None:
-            file_path = _realhandle_type(
-                req, resp, http.MIMETYPE_APPLICATION_OCTET_STREAM)
+            file_path = _realhandle_type(req, resp,
+                                         http.MIMETYPE_APPLICATION_OCTET_STREAM, None)
             if file_path:
                 return
 
@@ -77,7 +80,7 @@ class WebApplication(object):
                 ext = exts[len(exts)-1]
                 cont_type = http.mimetype(ext)
 
-            file_path = _realhandle_type(req, resp, cont_type)
+            file_path = _realhandle_type(req, resp, cont_type, None)
             if file_path:
                 return
 
@@ -85,8 +88,8 @@ class WebApplication(object):
             pass
 
         def _jsload(req: httprequest.HttpRequest, resp: httpresponse.HttpResponse) -> None:
-            file_path = _realhandle_type(
-                req, resp, http.MIMETYPE_TEXT_JAVASCRIPT)
+            file_path = _realhandle_type(req, resp,
+                                         http.MIMETYPE_TEXT_JAVASCRIPT, webcontext.WEBCTX_RESPONSE_ENCODING_UTF8)
             if file_path:
                 return
 

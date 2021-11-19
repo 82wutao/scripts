@@ -4,6 +4,7 @@ from re import I
 from wsgiref.simple_server import make_server
 from servlet import http, httpresponse, webcontext
 from os import path
+import json
 
 
 from servlet.httprequest import HttpRequest
@@ -29,6 +30,21 @@ def helloworld2(http_request: HttpRequest, http_response: HttpResponse):
     other_args['name'] = 'python3'
     http_response.responsex(http.HTTP_STATUSCODE_200,
                             "hello.tpl", **other_args)
+
+
+class Student(object):
+    def __init__(self) -> None:
+        super().__init__()
+        self.name: str = "的的嘎嘎wutao"
+        self.age: int = 99
+
+
+@app.requestmapping('/json/*', 'get')
+@app.formatresponse(renders.jsonrender)
+def helloworld3(http_request: HttpRequest, http_response: HttpResponse):
+    s = Student()
+
+    http_response.responsex(http.HTTP_STATUSCODE_200, s)
 
 
 if __name__ == "__main__":

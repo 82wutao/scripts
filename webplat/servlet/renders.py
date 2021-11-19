@@ -79,14 +79,15 @@ def jsonrender(content: Any, other: Dict, headers: Dict, webctx: webcontext.WebC
     '''
     import json
 
-    out: str = json.dumps(content)
+    out: str = json.dumps(content,
+                          ensure_ascii=False, default=lambda o: o.__dict__)
 
     encoding = webctx.getotherattr(webcontext.WEBCTX_RESPONSE_ENCODING_KEY)
     if encoding is None:
         encoding = webcontext.WEBCTX_RESPONSE_ENCODING_UTF8
-
     headers[http.HTTP_HEADER_CONTENTTYPE] = '%s' % (
-        http.HTTP_MEMITYPE_JSON, encoding)
+        http.MIMETYPE_APPLICATION_JSON)
+
     return [out.encode(encoding)]
 
 
@@ -111,7 +112,7 @@ def filerender(content: Any, other: Dict, headers: Dict, webctx: webcontext.WebC
         return [bs]
 
     headers[http.HTTP_HEADER_CONTENTTYPE] = '%s' % (
-        http.HTTP_MEMITYPE_OCTET_STREAM)
+        http.MIMETYPE_APPLICATION_OCTET_STREAM)
     return [bs]
 
 
@@ -125,5 +126,5 @@ def bytesender(content: Any, other: Dict, headers: Dict, webctx: webcontext.WebC
         return bs
 
     headers[http.HTTP_HEADER_CONTENTTYPE] = '%s' % (
-        http.HTTP_MEMITYPE_OCTET_STREAM)
+        http.MIMETYPE_APPLICATION_OCTET_STREAM)
     return bs
