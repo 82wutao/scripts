@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict
 
 from servlet import webcontext
 
-from . import httpheader
+from . import http
 from . import renders
 
 
@@ -32,10 +32,9 @@ class HttpResponse(object):
         self.renderfunc = r
         pass
 
-    def redirect(self, url: str, status_code: int = httpheader.HTTP_STATUSCODE_301):
-        # Location: http: // www.example.org/index.asp
+    def redirect(self, url: str, status_code: int = http.HTTP_STATUSCODE_301):
         self.status_code = status_code
-        self.header_dict[httpheader.HTTP_HEADER_LOCATION] = url
+        self.header_dict[http.HTTP_HEADER_LOCATION] = url
         pass
 
     def rewrite(self, path: str):
@@ -61,7 +60,7 @@ class HttpResponse(object):
         self.content = cont
 
     def setcontenttype(self, conttype: str) -> None:
-        self.header_dict[httpheader.HTTP_HEADER_CONTENTTYPE] = conttype
+        self.header_dict[http.HTTP_HEADER_CONTENTTYPE] = conttype
 
     def addheader(self, header: str, value: str):
         self.header_dict[header] = value

@@ -2,7 +2,7 @@
 
 from typing import Any, Callable, Dict
 from . import webcontext
-from . import httpheader
+from . import http
 
 Render = Callable[[Any, Dict, Dict, webcontext.WebContext], bytes]
 
@@ -15,8 +15,8 @@ def htmlrender(content: Any, other: Dict, headers: Dict, webctx: webcontext.WebC
     if encoding is None:
         encoding = webcontext.WEBCTX_RESPONSE_ENCODING_UTF8
 
-    headers[httpheader.HTTP_HEADER_CONTENTTYPE] = '%s; charset=%s' % (
-        httpheader.HTTP_MEMITYPE_HTML, encoding)
+    headers[http.HTTP_HEADER_CONTENTTYPE] = '%s; charset=%s' % (
+        http.MIMETYPE_TEXT_HTML, encoding)
 
     snippets = str(content)
     return [snippets.encode(encoding)]
@@ -36,8 +36,8 @@ def jinjasnippetsrender(content: Any, other: Dict, headers: Dict, webctx: webcon
     if encoding is None:
         encoding = webcontext.WEBCTX_RESPONSE_ENCODING_UTF8
 
-    headers[httpheader.HTTP_HEADER_CONTENTTYPE] = '%s; charset=%s' % (
-        httpheader.HTTP_MEMITYPE_HTML, encoding)
+    headers[http.HTTP_HEADER_CONTENTTYPE] = '%s; charset=%s' % (
+        http.MIMETYPE_TEXT_HTML, encoding)
     return [out.encode(encoding)]
 
 
@@ -68,8 +68,8 @@ def jinjastemplaterender(content: Any, other: Dict, headers: Dict, webctx: webco
     if encoding is None:
         encoding = webcontext.WEBCTX_RESPONSE_ENCODING_UTF8
 
-    headers[httpheader.HTTP_HEADER_CONTENTTYPE] = '%s; charset=%s' % (
-        httpheader.HTTP_MEMITYPE_HTML, encoding)
+    headers[http.HTTP_HEADER_CONTENTTYPE] = '%s; charset=%s' % (
+        http.MIMETYPE_TEXT_HTML, encoding)
     return [out.encode(encoding)]
 
 
@@ -85,8 +85,8 @@ def jsonrender(content: Any, other: Dict, headers: Dict, webctx: webcontext.WebC
     if encoding is None:
         encoding = webcontext.WEBCTX_RESPONSE_ENCODING_UTF8
 
-    headers[httpheader.HTTP_HEADER_CONTENTTYPE] = '%s' % (
-        httpheader.HTTP_MEMITYPE_JSON, encoding)
+    headers[http.HTTP_HEADER_CONTENTTYPE] = '%s' % (
+        http.HTTP_MEMITYPE_JSON, encoding)
     return [out.encode(encoding)]
 
 
@@ -106,12 +106,12 @@ def filerender(content: Any, other: Dict, headers: Dict, webctx: webcontext.WebC
 
     assert type(bs) is bytes,  "assert fail in filerender"
 
-    cont_tp: str = headers.get(httpheader.HTTP_HEADER_CONTENTTYPE, None)
+    cont_tp: str = headers.get(http.HTTP_HEADER_CONTENTTYPE, None)
     if cont_tp is not None:
         return [bs]
 
-    headers[httpheader.HTTP_HEADER_CONTENTTYPE] = '%s' % (
-        httpheader.HTTP_MEMITYPE_OCTET_STREAM)
+    headers[http.HTTP_HEADER_CONTENTTYPE] = '%s' % (
+        http.HTTP_MEMITYPE_OCTET_STREAM)
     return [bs]
 
 
@@ -120,10 +120,10 @@ def bytesender(content: Any, other: Dict, headers: Dict, webctx: webcontext.WebC
     content as bytes
     '''
     bs: bytes = bytes(content)
-    cont_tp: str = headers.get(httpheader.HTTP_HEADER_CONTENTTYPE, None)
+    cont_tp: str = headers.get(http.HTTP_HEADER_CONTENTTYPE, None)
     if cont_tp is not None:
         return bs
 
-    headers[httpheader.HTTP_HEADER_CONTENTTYPE] = '%s' % (
-        httpheader.HTTP_MEMITYPE_OCTET_STREAM)
+    headers[http.HTTP_HEADER_CONTENTTYPE] = '%s' % (
+        http.HTTP_MEMITYPE_OCTET_STREAM)
     return bs

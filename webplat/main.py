@@ -2,7 +2,7 @@
 
 from re import I
 from wsgiref.simple_server import make_server
-from servlet import httpheader, httpresponse, webcontext
+from servlet import http, httpresponse, webcontext
 from os import path
 
 
@@ -19,7 +19,7 @@ app = WebApplication()
 def helloworld(http_request: HttpRequest, http_response: HttpResponse):
     path = http_request.getpath()
     body = '<h1>Hello, %s!</h1>' % (path)
-    http_response.responsex(httpheader.HTTP_STATUSCODE_200, body)
+    http_response.responsex(http.HTTP_STATUSCODE_200, body)
 
 
 @app.requestmapping('/index/*', 'get')
@@ -27,7 +27,7 @@ def helloworld(http_request: HttpRequest, http_response: HttpResponse):
 def helloworld2(http_request: HttpRequest, http_response: HttpResponse):
     other_args = dict()
     other_args['name'] = 'python3'
-    http_response.responsex(httpheader.HTTP_STATUSCODE_200,
+    http_response.responsex(http.HTTP_STATUSCODE_200,
                             "hello.tpl", **other_args)
 
 
