@@ -5,6 +5,7 @@ from wsgiref.simple_server import make_server
 from servlet import http, httpresponse, webcontext
 from os import path
 import json
+from servlet import httprequest
 
 
 from servlet.httprequest import HttpRequest
@@ -15,16 +16,14 @@ from servlet import renders
 app = WebApplication()
 
 
-@app.requestmapping('/hello/*', 'get')
-@app.formatresponse(renders.htmlrender)
+@app.requestmapping('/hello/*', 'get', renders.htmlrender)
 def helloworld(http_request: HttpRequest, http_response: HttpResponse):
     path = http_request.getpath()
     body = '<h1>Hello, %s!</h1>' % (path)
     http_response.responsex(http.HTTP_STATUSCODE_200, body)
 
 
-@app.requestmapping('/index/*', 'get')
-@app.formatresponse(renders.jinjastemplaterender)
+@app.requestmapping('/index/*', 'get', renders.jinjastemplaterender)
 def helloworld2(http_request: HttpRequest, http_response: HttpResponse):
     other_args = dict()
     other_args['name'] = 'python3'
@@ -39,12 +38,30 @@ class Student(object):
         self.age: int = 99
 
 
-@app.requestmapping('/json/*', 'get')
-@app.formatresponse(renders.jsonrender)
-def helloworld3(http_request: HttpRequest, http_response: HttpResponse):
+@app.requestmapping('/json/*', 'get', renders.jsonrender)
+def helloworld12(http_request: HttpRequest, http_response: HttpResponse):
     s = Student()
 
     http_response.responsex(http.HTTP_STATUSCODE_200, s)
+
+
+@app.requestmapping('/method/get', 'get', renders.htmlrender)
+def helloworld11(http_request: HttpRequest, http_response: HttpResponse):
+    query = http_request.getquery()
+    param = httprequest.query_as_form_urlencoded(query)
+
+    snippets = '<h1>%s</h1>' % (param['hello'])
+    http_response.responsex(http.HTTP_STATUSCODE_200, snippets)
+
+
+@app.requestmapping('/method/post', "post", renders.htmlrender)
+def helloworld3(http_request: HttpRequest, http_response: HttpResponse):
+    io_handle = http_request.getbody()
+    param = httprequest.body_as_form_urlencoded(
+        io_handle, http_request.getcontentlength())
+
+    snippets = '<h1>%s</h1>' % (param['age'])
+    http_response.responsex(http.HTTP_STATUSCODE_200, snippets)
 
 
 if __name__ == "__main__":

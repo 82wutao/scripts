@@ -96,25 +96,30 @@ class WebApplication(object):
             resp.responsex(http.HTTP_STATUSCODE_404, None)
             pass
 
+        def _htmlload(req: httprequest.HttpRequest, resp: httpresponse.HttpResponse) -> None:
+            file_path = _realhandle_type(req, resp,
+                                         http.MIMETYPE_TEXT_HTML,
+                                         webcontext.WEBCTX_RESPONSE_ENCODING_UTF8)
+            if file_path:
+                return
+
+            resp.responsex(http.HTTP_STATUSCODE_404, None)
+            pass
+
         self.mapurl("/static/js/*", _jsload, 'get')
         self.mapurl("/static/css/*", _cssload, 'get')
         self.mapurl("/static/img/*", _imgload, 'get')
         self.mapurl("/static/font/*", _octetstreamload, 'get')
-        #self.mapurl("/static/av/*", _resourceload, 'get')
+        self.mapurl("/static/template/.*html", _htmlload, 'get')
 
-    def requestmapping(self, url: str, method: str = '*'):
-        def proxy(func):
-            def wrapper(req: httprequest.HttpRequest, resp: httpresponse.HttpResponse):
-                func(req, resp)
-            self.mapurl(url_pattern=url, run=wrapper, method=method)
-            return wrapper
-        return proxy
-
-    def formatresponse(self, renderfunc: renders.Render):
+    def requestmapping(self, url: str,
+                       method: str = '*',
+                       renderfunc: renders.Render = renders.htmlrender):
         def proxy(func):
             def wrapper(req: httprequest.HttpRequest, resp: httpresponse.HttpResponse):
                 resp.setrender(renderfunc)
                 func(req, resp)
+            self.mapurl(url_pattern=url, run=wrapper, method=method)
             return wrapper
         return proxy
 

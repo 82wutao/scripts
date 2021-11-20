@@ -1,5 +1,10 @@
 
 
+from cgi import parse
+from io import BufferedReader
+from typing import IO, Any, Dict, TextIO, Tuple
+
+
 class HttpRequest(object):
 
     __ENV_KEY_REQUEST_METHOD = "REQUEST_METHOD"
@@ -8,6 +13,7 @@ class HttpRequest(object):
     __ENV_KEY_REMOTE_ADDR = "REMOTE_ADDR"
     __ENV_KEY_CONTENT_TYPE = "CONTENT_TYPE"
     __ENV_KEY_CONTENT_LENGTH = "CONTENT_LENGTH"
+    __ENV_KEY_WSGI_INPUT = "wsgi.input"
     __ENV_KEY_HTTP_HOST = "HTTP_HOST"
     __ENV_KEY_HTTP_USER_AGENT = "HTTP_USER_AGENT"
     __ENV_KEY_HTTP_ACCEPT = "HTTP_ACCEPT"
@@ -58,13 +64,6 @@ class HttpRequest(object):
     def getheaders(self) -> dict:
         return self.wsgi_env
 
-    def getcontenttype(self) -> str:
-        return self.wsgi_env[HttpRequest.__ENV_KEY_CONTENT_TYPE]
-
-    def getcontentlength(self) -> int:
-        length = self.wsgi_env[HttpRequest.__ENV_KEY_CONTENT_LENGTH]
-        return int(length)
-
     def getuseragent(self) -> str:
         return self.wsgi_env[HttpRequest.__ENV_KEY_HTTP_USER_AGENT]
 
@@ -80,25 +79,70 @@ class HttpRequest(object):
     def getcookie(self) -> str:
         return self.wsgi_env[HttpRequest.__ENV_KEY_HTTP_COOKIE]
 
-    def getbody(self) -> bytes:
-        return []
+    def getcontenttype(self) -> Tuple(str, str):
+        conttype: str = None
+        charset: str = None
 
+        type_charset: str = self.wsgi_env[HttpRequest.__ENV_KEY_CONTENT_TYPE]
+        if not type_charset:
+            return (conttype, charset)
+        segments = type_charset.split(' ')
+        conttype = segments[0]
+        for s in segments[1:]:
+            if not s.startswith("charset"):
+                continue
+            charset = s.split(":")[1]
+            break
+        return (conttype, charset)
 
-def body_as_xml(bs: bytes):
-    pass
+    def getcontentlength(self) -> int:
+        length = self.wsgi_env.get(HttpRequest.__ENV_KEY_CONTENT_LENGTH, '0')
+        return int(length)
 
+    def getbody(self) -> Tuple(IO, int, str, str):
+        '''
+        return io handle,content-lenght,content-type,charset
+        '''
+        handle: IO = None
+        length: int = None
+        conttype: str = None
+        charset: str = None
 
-def body_as_json(bs: bytes):
-    pass
+        length = self.getcontentlength()
+        if length == 0:
+            return handle, length, conttype, charset
+        conttype, charset = self.getcontenttype()
+        if not conttype:
+            return handle, length, conttype, charset
 
+        handle = self.wsgi_env[HttpRequest.__ENV_KEY_WSGI_INPUT]
+        return handle, length, conttype, charset
 
-def body_as_form_urlencoded(bs: bytes):
-    pass
+    def getbodyasjson(self) -> Dict[str, Any]:
+        import json
+
+        io_handle, contlength, conttype, charset = self.getbody()
+        if not io_handle:
+            return None
+        if not charset:
+            charset = 'UTF-8'
+        binstr = io_handle.read(contlength)
+        unistr = binstr.decode(charset)
+        return json.loads(unistr)
+
+    def getbodyasformurlencoded(self) -> Dict[str, Any]:
+        from urllib import parse
+        import json
+
+        io_handle, contlength, conttype, charset = self.getbody()
+        if not io_handle:
+            return None
+        if not charset:
+            charset = 'UTF-8'
+        binstr = io_handle.read(contlength)
+        unistr = binstr.decode(charset)
+        return parse.parse_qs(unistr)
 
 
 def body_as_form_multipart(bs: bytes):
-    pass
-
-
-def query_as_form_urlencoded(query: str):
     pass

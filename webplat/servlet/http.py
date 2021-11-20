@@ -58,7 +58,6 @@ HTTP_STATUSCODE_510 = 510
 HTTP_STATUSCODE_511 = 511
 
 __code_msgs: Dict[int, str] = dict()
-
 __code_msgs[HTTP_STATUSCODE_100] = "Continue"
 __code_msgs[HTTP_STATUSCODE_101] = "Switching Protocols"
 __code_msgs[HTTP_STATUSCODE_103] = "Early Hints"
