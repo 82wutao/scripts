@@ -1,10 +1,10 @@
 #!/usr/bin/python3
 
+from os import path
 from re import I
 from wsgiref.simple_server import make_server
+import bilirecommend
 from servlet import http, httpresponse, webcontext
-from os import path
-import json
 from servlet import httprequest
 
 
@@ -18,8 +18,8 @@ app = WebApplication()
 
 @app.requestmapping('/hello/*', 'get', renders.htmlrender)
 def helloworld(http_request: HttpRequest, http_response: HttpResponse):
-    path = http_request.getpath()
-    body = '<h1>Hello, %s!</h1>' % (path)
+    request_path = http_request.getpath()
+    body = '<h1>Hello, %s!</h1>' % (request_path)
     http_response.responsex(http.HTTP_STATUSCODE_200, body)
 
 
@@ -76,6 +76,8 @@ if __name__ == "__main__":
     webctx = webcontext.WebContext(
         work_dir, "resource", "resource/template", **other_setting)
     app.setwebcontext(webctx)
+
+    bilirecommend.route(app)
 
     httpd = make_server('', 8000, app)
     print('Serving HTTP on port 8000...')

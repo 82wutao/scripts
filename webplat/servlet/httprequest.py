@@ -79,7 +79,7 @@ class HttpRequest(object):
     def getcookie(self) -> str:
         return self.wsgi_env[HttpRequest.__ENV_KEY_HTTP_COOKIE]
 
-    def getcontenttype(self) -> Tuple(str, str):
+    def getcontenttype(self) -> Tuple[str, str]:
         conttype: str = None
         charset: str = None
 
@@ -99,7 +99,7 @@ class HttpRequest(object):
         length = self.wsgi_env.get(HttpRequest.__ENV_KEY_CONTENT_LENGTH, '0')
         return int(length)
 
-    def getbody(self) -> Tuple(IO, int, str, str):
+    def getbody(self) -> Tuple[IO, int, str, str]:
         '''
         return io handle,content-lenght,content-type,charset
         '''
@@ -132,7 +132,6 @@ class HttpRequest(object):
 
     def getbodyasformurlencoded(self) -> Dict[str, Any]:
         from urllib import parse
-        import json
 
         io_handle, contlength, conttype, charset = self.getbody()
         if not io_handle:
