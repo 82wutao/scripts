@@ -127,7 +127,27 @@ def statusline(code: int) -> str:
 HTTP_HEADER_CONTENTTYPE = "Content-Type"
 HTTP_HEADER_CONTENTLENGTH = "Content-Length"
 HTTP_HEADER_LOCATION = "Location"
+HTTP_HEADER_ACCEPTENCODING = "Accept-Encoding"
+HTTP_HEADER_CONTENTENCODING = "Content-Encoding"
 
+
+HTTP_CONTENTENCODING_GZIP = "gzip"
+HTTP_CONTENTENCODING_COMPRESS = "compress"
+HTTP_CONTENTENCODING_DEFLATE = "deflate"
+HTTP_CONTENTENCODING_IDENTITY = "identity"
+HTTP_CONTENTENCODING_BR = "br"
+
+#gzip
+#    表示采用  Lempel-Ziv coding (LZ77) 压缩算法，以及32位CRC校验的编码方式。这个编码方式最初由 UNIX 平台上的 gzip 程序采用。出于兼容性的考虑， HTTP/1.1 标准提议支持这种编码方式的服务器应该识别作为别名的 x-gzip 指令。
+#compress
+#    采用 Lempel-Ziv-Welch (LZW) 压缩算法。这个名称来自UNIX系统的 compress 程序，该程序实现了前述算法。
+#    与其同名程序已经在大部分UNIX发行版中消失一样，这种内容编码方式已经被大部分浏览器弃用，部分因为专利问题（这项专利在2003年到期）。
+#deflate
+#    采用 zlib 结构 (在 RFC 1950 中规定)，和 deflate 压缩算法(在 RFC 1951 中规定)。
+#identity
+#    用于指代自身（例如：未经过压缩和修改）。除非特别指明，这个标记始终可以被接受。
+#br
+#    表示采用 Brotli 算法的编码方式。 
 
 # https://developer.mozilla.org/zh-CN/docs/Web/HTTP/Basics_of_HTTP/MIME_types
 # text 	表明文件是普通文本，理论上是人类可读
