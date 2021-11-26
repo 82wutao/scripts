@@ -6,6 +6,11 @@
 sudo su postgres  
 psql
 ~~~
+## 用户shell中执行命令
+~~~shell
+prompt [PGpassword=xxyyzz] psql -h<host> [-P<port>] -u<username> <database>
+-c"sql statement or command"
+~~~
 
 ## 权限管理
 ~~~sql
@@ -23,4 +28,11 @@ TO { PUBLIC | GROUP group | username }
 # CREATE
 ~~~sql
 CREATE DATABASE exampledb OWNER dbuser;
+~~~
+# 数据表间复制
+~~~SQL
+insert into tbl_b(tbl_b.clmn1,[tbl_b.clmn2,...]) 
+select tbl_a.clmn1|expression|constant[,...] from tbl_a;
+
+-- len(tbl_b.clmns[]) == len(tbl_a.select clmns)
 ~~~
