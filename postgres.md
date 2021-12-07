@@ -36,3 +36,7 @@ select tbl_a.clmn1|expression|constant[,...] from tbl_a;
 
 -- len(tbl_b.clmns[]) == len(tbl_a.select clmns)
 ~~~
+# 数据/SCHEMA 备份
+~~~SQL
+PGPASSWORD=xx pg_dump -U $ -h $ -p $ -d $ -t $ [--column-inserts] -f $.sql -F P -v
+~~~
