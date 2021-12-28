@@ -84,30 +84,41 @@
 #     # 开始监听HTTP请求:
 #     httpd.serve_forever()
 #     pass
-from quickcli.client import HttpReqData, doRequest, newHttpConnection
+import sys
+from quickcli.client import HttpReqData, do_request,  open_http_connection
 from quickcli import httpconst
 
 
 headers = {}
-headers['Host'] = 'www.runoob.com'
+headers['Host'] = 'www.cypherhunter.com'
 headers['User-Agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:95.0) Gecko/20100101 Firefox/95.0'
-headers['Accept'] = 'text/html, application/xhtml+xml, application/xml; q= 0.9, image/avif, image/webp, */*; q = 0.8'
-headers['Accept-Language'] = 'zh-CN, zh; q = 0.8, zh-TW; q = 0.7, zh-HK; q = 0.5, en-US; q = 0.3, en; q = 0.2'
+headers['Accept'] = 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8'
+headers['Accept-Language'] = 'zh-CN,en;q=0.8,zh;q=0.7,zh-TW;q=0.5,zh-HK;q=0.3,en-US;q=0.2'
 headers['Accept-Encoding'] = 'gzip, deflate, br'
+headers['DNT'] = '1'
+headers['Alt-Used'] = 'www.cypherhunter.com'
 headers['Connection'] = 'keep-alive'
+headers['Cookie'] = 'NEXT_LOCALE=en'
 headers['Upgrade-Insecure-Requests'] = '1'
 headers['Sec-Fetch-Dest'] = 'document'
 headers['Sec-Fetch-Mode'] = 'navigate'
-headers['Sec-Fetch-Site'] = 'same-origin'
+headers['Sec-Fetch-Site'] = 'none'
 headers['Sec-Fetch-User'] = '?1'
+headers['TE'] = 'trailers'
+
 req = HttpReqData().request(httpconst.METHOD_GET,
-                            '/python3/python3-function.html', None).send(headers, None, None)
-conn = newHttpConnection(
-    httpconst.HTTPS, "www.runoob.com", httpconst.HTTPSPORT)
-resp = doRequest(conn, req)
+                            '/', None).send(headers, None, None)
+conn = open_http_connection(
+    httpconst.HTTPS, "www.cypherhunter.com", httpconst.HTTPSPORT)
+resp = do_request(conn, req)
 
 
-def mapfunc(body, contty,  charset: bytes) -> str:
+def mapfunc(body, contty,  charset) -> str:
+    print("type{} charset:{}".format(contty, charset))
+    import io
+    import sys
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding=charset)
+
     return body.decode(charset)
 
 

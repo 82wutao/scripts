@@ -251,7 +251,7 @@ _mimetypes["z"] = "application/x-compress"
 _mimetypes["zip"] = "application/zip"
 
 
-def mimetypeOnExt(ext: str) -> str:
+def mimetype_on_ext(ext: str) -> str:
     return _mimetypes.get(ext, MIMETYPE_APPLICATION_OCTET_STREAM)
 
 
@@ -371,7 +371,7 @@ _statusmsg[STATUSCODE_510] = "Not Extended"
 _statusmsg[STATUSCODE_511] = "Network Authentication Required"
 
 
-def msgOnStatuscode(code: int) -> str:
+def msg_on_statuscode(code: int) -> str:
     '''
     return status msg
     '''
@@ -381,7 +381,7 @@ def msgOnStatuscode(code: int) -> str:
 
 def statusline(code: int) -> str:
     '''
-    return "$code $msg"
+    return $code $msg
     '''
     msg = _statusmsg.get(code, '--')
     return '%d %s' % (code, msg)
