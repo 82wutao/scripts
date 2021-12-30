@@ -1,3 +1,4 @@
+
 模型 前馈 》结果 损失函数 》链式求导 后馈 》学习速率 * 导数 参数微调
 
 ```
@@ -51,3 +52,4 @@ $$(-2 +2Ypred) \ast \frac{\partial active\_func\_o(h3N1*ow1+,...)}{\partial h3N1
 
 
 
+ 
