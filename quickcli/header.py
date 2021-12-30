@@ -62,15 +62,7 @@ Range: <unit>=-<suffix-length>
 消息头 	描述 	更多信息 	标准
  
 
-Access-Control-Allow-Credentials 		HTTP Access Control and Server Side Access Control 	W3C Cross-Origin Resource Sharing
-Access-Control-Allow-Origin 		HTTP Access Control and Server Side Access Control 	W3C Cross-Origin Resource Sharing
-Access-Control-Allow-Methods 		HTTP Access Control and Server Side Access Control 	W3C Cross-Origin Resource Sharing
-Access-Control-Allow-Headers 		HTTP Access Control and Server Side Access Control 	W3C Cross-Origin Resource Sharing
-Access-Control-Max-Age 		        HTTP Access Control and Server Side Access Control 	W3C Cross-Origin Resource Sharing
-Access-Control-Expose-Headers 		HTTP Access Control and Server Side Access Control 	W3C Cross-Origin Resource Sharing
-Access-Control-Request-Method 		HTTP Access Control and Server Side Access Control 	W3C Cross-Origin Resource Sharing
-Access-Control-Request-Headers 		HTTP Access Control and Server Side Access Control 	W3C Cross-Origin Resource Sharing
-
+ 
 Age
 Allow
 Alternates 		HTTP Content Negotiation 	RFC 2295, §8.3
