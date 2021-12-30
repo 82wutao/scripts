@@ -14,16 +14,25 @@ loss = loss_func([]expect,[]pred)
    sum((expect-pred)**2)
 ```
 
-$$ Loss = L = (Yexpect - Ypred)^{2}$$
+$$ Loss = L = (Yexpect - Ypred)^2$$
 
-$$\frac{\partial L}{\partial ow1}$$
-$$\frac{\partial L}{\partial Ypred} \ast \frac{\partial Ypred}{\partial ow1}$$
-$$\frac{\partial (Yexpect - Ypred)^{2}}{\partial Ypred} \ast \frac{\partial active\_func\_o(h3N1*ow1+,...)}{\partial ow1}$$
+$$\frac{\partial L}{\partial oW1}$$
+$$\frac{\partial L}{\partial Ypred} \ast \frac{\partial Ypred}{\partial oW1}$$
+$$\frac{\partial (Yexpect - Ypred)^2}{\partial Ypred} \ast \frac{\partial active\_func\_o(h3N1*ow1+,...)}{\partial ow1}$$
 $$ (-2 +2Ypred) \ast h3N1 * active\_func\_o'(h3N1*ow1+,...)$$
 
 ---
-$$ h3N1 = ow1 * active\_func\_o'(h3N1*ow1+,...)$$
+$$\frac{\partial L}{\partial h3N1W1}$$
+$$\frac{\partial L}{\partial Ypred} \ast \frac{\partial Ypred}{\partial h3N1W1}$$
+$$\frac{\partial (Yexpect - Ypred)^2}{\partial Ypred} \ast \frac{\partial Ypred}{\partial h3N1} \ast \frac{\partial h3N1}{\partial h3N1W1}$$ 
+$$(-2 +2Ypred) \ast \frac{\partial active\_func\_o(h3N1*ow1+,...)}{\partial h3N1} \ast \frac{\partial active\_func\_h3(h2N1*h3N1W1+,...)}{\partial h3N1W1}$$ 
 ---
+$$\frac{\partial L}{\partial h2N1W1}$$
+$$\frac{\partial L}{\partial Ypred} \ast \frac{\partial Ypred}{\partial h2N1W1}$$  
+
+$$\frac{\partial (Yexpect - Ypred)^2}{\partial Ypred} \ast \frac{\partial Ypred}{\partial h3N[1->o]} \ast \frac{\partial h3N[1->o]}{\partial h2N1} \ast \frac{\partial h2N1}{\partial h2N1W1}$$ 
+
+$$(-2 +2Ypred) \ast \frac{\partial active\_func\_o(h3N1*ow1+,...)}{\partial h3N1} \ast \frac{\partial active\_func\_h3(h2N1*h3N1W1+,...)}{\partial h3N1W1}$$ 
 
 
 
