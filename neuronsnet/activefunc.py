@@ -12,3 +12,7 @@ def sigmoid_func(z: float) -> float:
 def sigmoid_func_derivative(a: float) -> float:
     f: Callable[[float], float] = sigmoid_func
     return f(a)*(1-f(a))
+
+
+def loss_4_sigmoid(y_expected: float, y_pred: float) -> float:
+    pass
