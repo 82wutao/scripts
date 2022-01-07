@@ -122,40 +122,28 @@ X-Requested-With 	通常在值为“XMLHttpRequest”时使用		Not standard
 
 
 class HttpHeaderData:
-    '''
-    通用首部指的是可以应用于请求和响应中，但是不能应用于消息内容自身的 HTTP 首部\n
-    请求中使用，并且和请求主体无关\n
-    响应中并且和响应消息主体无关的那一类
-    HTTP 消息有效载荷（即关于消息主体的元数据）的 HTTP 报头
-    '''
     _type_alias = TypeVar('_type_alias', bound='HttpHeaderData')
 
     def __init__(self) -> None:
         self._headers: Dict[str, str] = dict()
 
     @staticmethod
-    def wrap_headers(headers: Mapping[str, str]) -> _type_alias:
+    def wrap_headers_with(headers: Mapping[str, str]) -> _type_alias:
         d: HttpHeaderData._type_alias = HttpHeaderData._type_alias()
         d._headers = headers
         return d
 
-    def generic_header(self) -> None:
+    @staticmethod
+    def build_header_data() -> _type_alias:
+        d: HttpHeaderData._type_alias = HttpHeaderData._type_alias()
+        return d
 
-        pass
+    def add_header(self, key: str, v: str) -> _type_alias:
+        self._headers[key] = v
+        return self
 
-    def entity_header(self) -> None:
+    def to_header_dict(self) -> Dict[str, str]:
+        return self._headers
 
-        pass
-
-    def request_header(self) -> None:
-        #  Accept、Accept-*、 If-* 允许执行条件请求。某些请求头如：Cookie, User-Agent 和 Referer  Host
-        #
-        # Accept,
-        # Accept-Language,
-        # Content-Language,
-        # Content-Type并且值是 application/x-www-form-urlencoded, multipart/form-data, 或者 text/plain之一的（忽略参数）.
-        pass
-
-    def response_header(self) -> None:
-        # 像Age, Location 和 Server都属于响应头
-        pass
+    def header_value(self, k: str, default_v: str = None) -> str:
+        return self._headers.get(k, default_v)
