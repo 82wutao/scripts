@@ -1,17 +1,12 @@
 
 from _typeshed import NoneType
 from sys import flags
-from typing_extensions import Self
 import numpy as np
 from typing import Callable, List, NoReturn, Tuple, TypeVar
 
 
 from neuronsnet import activefunc
 
-
-ActiveFunction = Callable[[List[float]], List[float]]
-DerivativeActiveFunction = Callable[[List[float]], List[float]]
-Loss = Callable[[List[float], List[float]], List[float]]
 
 # def active_func(Z: List[float]) -> List[float]:
 #     result: List[float] = []
@@ -32,14 +27,16 @@ Loss = Callable[[List[float], List[float]], List[float]]
 class Layer:
 
     def __init__(self, nodes: int, weights: int,
-                 active_func: ActiveFunction, derivative_active: DerivativeActiveFunction) -> None:
+                 active_func: activefunc.ActiveFunc,
+                 active_derivative_builder: activefunc.ActiveDerivativeBuilder) -> None:
         self._w_shape: Tuple[int, int] = (weights, nodes)
         self._W: np.matrix = np.random.rand(
             weights * nodes).reshape(weights, nodes)
         self._B: np.ndarray = np.random.rand(nodes)
 
-        self._active_func = active_func
-        self._derivative_fctive = derivative_active
+        self._activefunc = active_func
+        self._active_derivative_builder = active_derivative_builder
+        self._activefunc_derivative = None
 
         self._Z: np.ndarray = None
         self._A: np.ndarray = None
@@ -52,17 +49,20 @@ class Layer:
         return self._Z.tolist()
 
     def calc_a(self) -> List[float]:
-        resultset: List[float] = self._active_func(self._Z.tolist())
+        resultset: List[float] = self._activefunc(self._Z.tolist())
         self._A = np.array(resultset)
         return resultset
+
+    def update_active_derivate(self, y_exp: List[float]) -> NoReturn:
+        self._activefunc_derivative = self._active_derivative_builder(y_exp)
 
     def gradient_descent(self, delta_next_layer: List[float], weights_next_layer: List[List[float]],
                          learn_rate: float) -> Tuple[List[float], List[List[float]]]:
 
         DNL: np.matrix = np.mat(delta_next_layer)
         WNL: np.matrix = np.mat(weights_next_layer)
-        # TODO np.dot(DNL, WNL.T)* 激活函数导数的矩阵
-        DCL: np.matrix = NoneType
+        DCL: np.matrix = np.dot(DNL, WNL.T) * np.mat(
+            self._activefunc_derivative(self._Z.tolist()))
 
         ret: Tuple[List[float], List[List[float]]] = tuple(DCL.tolist()[0],
                                                            self._W.tolist())
@@ -91,23 +91,29 @@ def generate_eye_matrix(n: int, v: Decimal) -> List[List[Decimal]]:
 class NeuronsNetFramework:
     _alias_nnfw = TypeVar("_alias_nnfw", bound="NeuronsNetFramework")
 
-    def __init__(self, layers: List[Tuple[int, ActiveFunction, DerivativeActiveFunction]], loss: Loss) -> None:
+    def __init__(self,
+                 layers: List[Tuple[int, activefunc.ActiveFunc, activefunc.ActiveDerivativeBuilder]],
+                 loss: activefunc.LossFunc,
+                 loss_derivative: activefunc.LossFuncDerivative) -> None:
+
         self._layers_setting: List[Tuple[int,
-                                         ActiveFunction, DerivativeActiveFunction]] = layers
-        self._loss: Loss = loss
+                                         activefunc.ActiveFunc, activefunc.ActiveDerivativeBuilder]] = layers
         self._layers: List[Layer] = []
+
+        self._loss: activefunc.LossFunc = loss
+        self._loss_derivative: activefunc.LossFuncDerivative = loss_derivative
 
     def train(self, X: List[List[float]], Y: List[List[float]], epoches: int, learn_rate: float):
         self._layers_setting.insert(0, (len(X[0]), None, None))
         for i in range(1, len(self._layers_setting), 1):
-            layer_setting: Tuple(int, ActiveFunction,
-                                 DerivativeActiveFunction) = self._layers_setting[i]
-            pre_layer_setting: Tuple(int, ActiveFunction,
-                                     DerivativeActiveFunction) = self._layers_setting[i-1]
+            layer_setting: Tuple(int, activefunc.ActiveFunc,
+                                 activefunc.ActiveDerivativeBuilder) = self._layers_setting[i]
+            pre_layer_setting: Tuple(int, activefunc.ActiveFunc,
+                                     activefunc.ActiveDerivativeBuilder) = self._layers_setting[i-1]
             nodes = layer_setting[0]
             weights = pre_layer_setting[0]
             layer: Layer = Layer(nodes=nodes, weights=weights,
-                                 active_func=layer_setting[1], derivative_active=layer_setting[2])
+                                 active_func=layer_setting[1], active_derivative_builder=layer_setting[2])
             self._layers.append(layer)
         self._X = X
         self._Y = Y
@@ -116,7 +122,7 @@ class NeuronsNetFramework:
             for x_sample, y_expect in zip(self._X, self._Y):
                 y_pred: List[float] = self._forward(x_sample)
                 loss_delta: List[float] = self._cost(y_expect, y_pred)
-                self._back(loss_delta, learn_rate)
+                self._back(y_expect, loss_delta, learn_rate)
             # TODO 算一下当前权重下的 损失
             print("in epoches {} loss {}".format(e, 0))
 
@@ -128,9 +134,11 @@ class NeuronsNetFramework:
         return _input_x
 
     def _cost(self, y_expect: List[float], y_pred: List[float]) -> List[float]:
-        self._loss
+        return self._loss_derivative(y_expect, y_pred)
 
-    def _back(self, delta: List[float], learn_rate: float):
+    def _back(self, y_expect: List[float], delta: List[float], learn_rate: float):
+        for l in self._layers[:0:-1]:
+            l.update_active_derivate(y_expect)
 
         out_layer_nodes: int = self._layers[-1].nodes()
         virtual_w: List[List[float]] = generate_eye_matrix(out_layer_nodes, 1)
@@ -140,8 +148,3 @@ class NeuronsNetFramework:
         for l in self._layers[:0:-1]:
             delta_next_layer, weights_next_layer = l.gradient_descent(delta_next_layer, weights_next_layer,
                                                                       learn_rate)
-
-
-l = Layer(3, 4)
-print(l.calc_z([1, 1, 1, 1]))
-print(l.calc_a())
