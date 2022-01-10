@@ -4,7 +4,7 @@ import numpy as np
 from typing import List, NoReturn, Tuple, TypeVar
 
 
-from neuronsnet import activefunc
+from neuralnetworks import activefunc
 
 
 class Layer:
@@ -45,20 +45,23 @@ class Layer:
 
         DNL: np.matrix = np.mat(delta_next_layer)
         WNL: np.matrix = np.mat(weights_next_layer)
-        DCL: np.matrix = np.dot(DNL, WNL.T) * np.mat(
+        DCL: np.matrix = np.asarray(np.dot(DNL, WNL.T)) * np.array(
             self._activefunc_derivative(self._Z.tolist()[0]))
 
-        ret: Tuple[List[float], List[List[float]]] = tuple(DCL.tolist()[0],
-                                                           self._W.tolist())
+        ret: Tuple[List[float], List[List[float]]] = (DCL.tolist()[0],
+                                                      self._W.tolist())
 
         delta_weigts: np.matrix = np.dot(self._X_input.T, DCL)
-        delta_b: np.ndarray = DCL.A[0]
-        self._W = self._W - learn_rate * delta_weigts
-        self._B = self._B - learn_rate * delta_b
+        delta_b: np.ndarray = np.asarray(DCL.tolist()[0])
+        self._W = self._W - (learn_rate * delta_weigts)
+        self._B = self._B - (learn_rate * delta_b)
         return ret
 
     def nodes(self) -> int:
         return self._w_shape[1]
+
+    def weights_bs(self) -> Tuple[List[List[float]], List[float]]:
+        return (self._W.tolist(), self._B.tolist())
 
 
 Decimal = TypeVar("Decimal",  int, float)
@@ -105,11 +108,21 @@ class NeuralNetframework:
         for e in range(epoches):
             for x_sample, y_expect in zip(self._X, self._Y):
                 y_pred: List[float] = self._feedforward(x_sample)
-                self._backpropagation(y_expect, y_pred, learn_rate)
-            # TODO 算一下当前权重下的 损失
 
-        # loss_delta: List[float] = self._cost(y_expect, y_pred)
-        # print("in epoches {} loss {}".format(e, 0))
+                # print("debug training x:{},y:{},z:{},softmax{}".format(
+                #     x_sample, y_expect, self._layers[-1]._Z.tolist()[0], y_pred))
+                self._backpropagation(y_expect, y_pred, learn_rate)
+            if e % 100 == 0:
+                mean_loss: float = self._test_cost(self._X, self._Y)
+                print("in epoches {} loss {}".format(e, mean_loss))
+
+        mean_loss: float = self._test_cost(self._X, self._Y)
+        print("in epoches {} loss {}".format(e, mean_loss))
+
+        for li in range(len(self._layers)):
+            layer = self._layers[li]
+            ws_bs = layer.weights_bs()
+            print("layer {} weights:{} bs:{}".format(li, ws_bs[0], ws_bs[1]))
 
     def _feedforward(self, x: List[float]) -> List[float]:
         _input_x: List[float] = x
@@ -118,14 +131,18 @@ class NeuralNetframework:
             _input_x = l.calc_a()
         return _input_x
 
-    def _cost(self, y_expect: List[float], y_pred: List[float]) -> float:
-        # TODO 算一下损失
-        return 0
+    def _test_cost(self, X: List[List[float]], Y: List[List[float]]) -> float:
+        # 当前权重参数
+        # 得到每个样本的结果，求得 loss
+        # sum(loss)/n
+        sum: float = 0
+        for x_sample, y_expect in zip(X, Y):
+            y_pred: List[float] = self._feedforward(x_sample)
+            loss: float = self._loss(y_expect, y_pred)
+            sum += loss
+        return sum/len(X)
 
     def _backpropagation(self, y_expect: List[float], y_pred: List[float], learn_rate: float):
-        loss: float = self._loss(y_expect, y_pred)
-        print("debug : loss is {}".format(loss))
-
         delta: List[float] = self._loss_derivative(y_expect, y_pred)
 
         for l in self._layers[:0:-1]:

@@ -22,13 +22,22 @@ def active_sigmoid(Z: List[float]) -> List[float]:
 def active_softmax(Y: List[float]) -> List[float]:
     '''激活函数'''
     a: float = max(Y)
-
     s: float = 0
+
+    debt: float = 0
+
     exp_yi: List[float] = []
     for yi in Y:
         r: float = math.exp(yi-a)
         s = s + r
+
+        if r == 0:
+            debt += 0.0001
+            r = 0.0001
         exp_yi.append(r)
+
+    a: float = max(exp_yi)
+    exp_yi = [i if i != a else i-debt for i in exp_yi]
 
     return [expi/s for expi in exp_yi]
 
@@ -36,7 +45,7 @@ def active_softmax(Y: List[float]) -> List[float]:
 def sigmoid_derivative(Z: List[float]) -> List[float]:
     '''f(a)*(1-f(a))'''
     A: List[float] = active_sigmoid(Z)
-    return [a * (1-a)for a in A]
+    return [a * (1-a) for a in A]
 
 
 def softmax_derivative(y_expected: List[float], Y_pred: List[float]) -> List[float]:
@@ -70,14 +79,16 @@ def loss_meansquarederror(y_expected: List[float], y_pred: List[float]) -> float
 
 def loss_crossentropy(y_expected: List[float], y_pred: List[float]) -> float:
     '''损失函数: 交叉熵'''
-    cost: float = util_funcs.reduce(lambda s, x: -(x[0] * math.log(x[1]))+s,
+    def sum_of_crossentropy(s, x):
+        return -(x[0] * math.log(x[1]))+s
+
+    cost: float = util_funcs.reduce(sum_of_crossentropy,
                                     [expected_pred for expected_pred in zip(y_expected, y_pred) if expected_pred[0] > 0], 0)
     return cost
 
 
 def meansquarederror_derivative(y_expected: List[float], y_pred: List[float]) -> List[float]:
     '''损失函数偏导数，求delta: 均方误差偏导数'''
-
     n: int = len(y_pred)
     return [(ep[1]-ep[0]) * 2 / n for ep in zip(y_expected, y_pred)]
 
@@ -90,11 +101,12 @@ def crossentropy_derivative(y_expected: List[float], y_pred: List[float]) -> Lis
     return ret
 
 
-s_r = active_softmax([2, 3, 4])
+s_r = active_softmax(
+    [-3.549232312452597e+82, -3.1117660118039134e+82, 5.567166300845371e+82])
 print("softmax {}".format(s_r))
 
-sd_r = softmax_derivative([0, 1, 0], s_r)
+sd_r = softmax_derivative([1, 0,  0], s_r)
 print("softmax_derivative {}".format(sd_r))
 
-cd_r = crossentropy_derivative([0, 1, 0], s_r)
+cd_r = crossentropy_derivative([1, 0,  0], s_r)
 print([z[0] * z[1] for z in zip(sd_r, cd_r)])
