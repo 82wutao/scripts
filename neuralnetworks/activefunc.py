@@ -21,24 +21,13 @@ def active_sigmoid(Z: List[float]) -> List[float]:
 
 def active_softmax(Y: List[float]) -> List[float]:
     '''激活函数'''
-    a: float = max(Y)
     s: float = 0
-
-    debt: float = 0
 
     exp_yi: List[float] = []
     for yi in Y:
-        r: float = math.exp(yi-a)
+        r: float = math.exp(yi)
         s = s + r
-
-        if r == 0:
-            debt += 0.0001
-            r = 0.0001
         exp_yi.append(r)
-
-    a: float = max(exp_yi)
-    exp_yi = [i if i != a else i-debt for i in exp_yi]
-
     return [expi/s for expi in exp_yi]
 
 
@@ -59,8 +48,48 @@ def softmax_derivative(y_expected: List[float], Y_pred: List[float]) -> List[flo
             for j in range(len(Y_pred))]
 
 
+def active_tanh(Z: List[float]) -> List[float]:
+    P: List[float] = [math.exp(z) for z in Z]
+    N: List[float] = [math.exp(-z) for z in Z]
+    return [(pn[0]-pn[1])/(pn[0]+pn[1]) for pn in zip(P, N)]
+
+
+def active_relu(Z: List[float]) -> List[float]:
+    return [max(0, z) for z in Z]
+
+
+def active_leakyrelu(Z: List[float]) -> List[float]:
+    return [1 if z > 0 else 0.1 * z for z in Z]
+
+
+def tanh_derivative(Z: List[float]) -> List[float]:
+    # 二、tanh的偏导数计算公式
+    A: List[float] = active_tanh(Z)
+    return [(1 - a**2) for a in A]
+
+
+def relu_derivative(Z: List[float]) -> List[float]:
+    return [1 if z > 0 else 0 for z in Z]
+
+
+def leakyrelu_derivative(Z: List[float]) -> List[float]:
+    return [1 if z > 0 else 0.1 for z in Z]
+
+
 def build_sigmoid_derivative(y_expected: List[float]) -> ActiveFuncDerivative:
     return sigmoid_derivative
+
+
+def build_tanh_derivative(y_expected: List[float]) -> ActiveFuncDerivative:
+    return tanh_derivative
+
+
+def build_relu_derivative(y_expected: List[float]) -> ActiveFuncDerivative:
+    return relu_derivative
+
+
+def build_leakyrelu_derivative(y_expected: List[float]) -> ActiveFuncDerivative:
+    return leakyrelu_derivative
 
 
 def build_softmax_derivative(y_expected: List[float]) -> ActiveFuncDerivative:
@@ -101,12 +130,12 @@ def crossentropy_derivative(y_expected: List[float], y_pred: List[float]) -> Lis
     return ret
 
 
-s_r = active_softmax(
-    [-3.549232312452597e+82, -3.1117660118039134e+82, 5.567166300845371e+82])
+s_r = active_softmax([2, 3, 4])
 print("softmax {}".format(s_r))
 
-sd_r = softmax_derivative([1, 0,  0], s_r)
+sd_r = softmax_derivative([0, 1, 0], s_r)
 print("softmax_derivative {}".format(sd_r))
 
-cd_r = crossentropy_derivative([1, 0,  0], s_r)
+cd_r = crossentropy_derivative([0, 1, 0], s_r)
+print(cd_r)
 print([z[0] * z[1] for z in zip(sd_r, cd_r)])

@@ -97,4 +97,5 @@ sd_r = softmax_derivative([0, 1, 0], s_r)
 print("softmax_derivative {}".format(sd_r))
 
 cd_r = crossentropy_derivative([0, 1, 0], s_r)
+print(cd_r)
 print([z[0] * z[1] for z in zip(sd_r, cd_r)])

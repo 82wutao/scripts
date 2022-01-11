@@ -5,6 +5,7 @@ from typing import List, NoReturn, Tuple, TypeVar
 
 
 from neuralnetworks import activefunc
+from neuralnetworks.activefunc import active_softmax
 
 
 class Layer:
@@ -37,24 +38,32 @@ class Layer:
         self._A = np.array(resultset)
         return resultset
 
+    def get_Z(self) -> List[float]:
+        return self._Z.tolist()[0]
+
+    def get_A(self) -> List[float]:
+        return self._A.tolist()
+
     def update_active_derivate(self, y_exp: List[float]) -> NoReturn:
         self._activefunc_derivative = self._active_derivative_builder(y_exp)
 
     def gradient_descent(self, delta_next_layer: List[float], weights_next_layer: List[List[float]],
-                         learn_rate: float) -> Tuple[List[float], List[List[float]]]:
+                         learn_rate: float, partial_derivative_arg: List[float]) -> Tuple[List[float], List[List[float]]]:
 
         DNL: np.matrix = np.mat(delta_next_layer)
         WNL: np.matrix = np.mat(weights_next_layer)
-        DCL: np.matrix = np.asarray(np.dot(DNL, WNL.T)) * np.array(
-            self._activefunc_derivative(self._Z.tolist()[0]))
+        DCL: np.matrix = np.asarray(np.dot(
+            DNL, WNL.T)) * np.array(self._activefunc_derivative(partial_derivative_arg))
 
         ret: Tuple[List[float], List[List[float]]] = (DCL.tolist()[0],
                                                       self._W.tolist())
 
-        delta_weigts: np.matrix = np.dot(self._X_input.T, DCL)
+        delta_weigts: np.matrix = np.dot(self._X_input.T, DCL)  # TODO 加正则损失
         delta_b: np.ndarray = np.asarray(DCL.tolist()[0])
+
         self._W = self._W - (learn_rate * delta_weigts)
         self._B = self._B - (learn_rate * delta_b)
+
         return ret
 
     def nodes(self) -> int:
@@ -154,5 +163,11 @@ class NeuralNetframework:
         weights_next_layer: List[List[float]] = virtual_w
         delta_next_layer: List[float] = delta
         for l in self._layers[:0:-1]:
+            output_layer: bool = l._activefunc == activefunc.active_softmax
+
+            partial_derivative_arg: List[float] = l.get_A()
+            if not output_layer:
+                partial_derivative_arg = l.get_Z()
+
             delta_next_layer, weights_next_layer = l.gradient_descent(delta_next_layer, weights_next_layer,
-                                                                      learn_rate)
+                                                                      learn_rate, partial_derivative_arg)
